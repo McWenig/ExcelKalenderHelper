@@ -1,0 +1,129 @@
+<html>
+<head>
+<link rel='stylesheet'
+	href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.css' />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/gcal.js'></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+
+<style type="text/css">
+.hover-end {
+	padding: 0px;
+	margin: 0px;
+	font-size: 100%;
+	text-align: center;
+	position: absolute;
+	bottom: 0;
+	width: 70%;
+	opacity: 1;
+	z-index: 10000;
+	background-color: inherit;
+	color: inherit;
+	border-radius: 12.3200006484985px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(141, 178, 67);
+	display: block;
+}
+</style>
+
+<script type="text/javascript">
+	$(document)
+			.ready(
+					function() {
+
+						var eventSrc = [ {
+							googleCalendarId : 'dbch66ql3ee9tm0sr97hrav20c@group.calendar.google.com',
+							cache : true,
+							id : "feiertage"
+						} ];
+
+						var colors = [ "yellow", "lightgreen", "orange", "aqua", "DarkOrchid" ];
+						var textColors = [ "black", "black", "black", "black", "white" ];
+
+						/*Initialisiere die eventSrc-es und die Select box */
+						$.get('/releases', {}, function(releases) {
+							/* erst eventSrc */
+							$.each(releases, function(index, release) {
+								source = {
+									id : release,
+									url : '/events/' + release,
+									color : colors[index % colors.length],
+									textColor : textColors[index % textColors.length],
+									cache : true
+								}
+								eventSrc.push(source);
+							})
+							/* Jetzt das dropdown */
+							$("#dropdown").append($("<option />").val('-1').text("Alle").attr("selected","selected"))
+							$.each(releases, function(index, release) {
+								$("#dropdown").append($("<option />").text(release))
+							})
+							/* jetzt die eventSrc-es zum Kalendar hinzufuegen und abholen */
+							$.each(eventSrc, function(index, value) {$('#calendar').fullCalendar('addEventSource', value)})
+							/* $('#calendar').fullCalendar('refetchEvents') */
+
+						});
+						
+						/* Jetzt wollen wir noch auf Änderungen der DropDown-Box reagieren */
+						$("#dropdown").selectmenu(
+							{
+								select : function(event, ui) {
+									if (ui.item.value == '-1') {
+										$('#calendar').fullCalendar('removeEventSources');
+										$.each(eventSrc,function(index,	value) {$('#calendar').fullCalendar('addEventSource',value)})
+									} else {
+										$('#calendar').fullCalendar('removeEventSources')
+										$.each(eventSrc,function(index,	value) {
+											/* Der Kalender mit der id feiertag ist der Google-Kalender mit den Feiertagen, der soll immer dabei sein */
+											if (value.id == ui.item.value || value.id == "feiertage") {
+												$('#calendar').fullCalendar('addEventSource',value)
+											}
+										})
+									}
+								}
+							});
+
+						/* last but not least definieren wir auch noch den Kalender, sonst war dies ganze Geschichte etwas müßig... */
+						$('#calendar')
+								.fullCalendar(
+										{
+											googleCalendarApiKey : 'AIzaSyAReCtvkcDwIZknN-Df1RDXOYQule8yyCs',
+											/* eventSources : eventSrc, */
+											weekNumbers : true,
+											weekends : false,
+											eventMouseover : function(event,
+													jsEvent, view) {
+												$(this).append(
+														'<div id=\"'+event.id+'\" class=\"hover-end\">'
+																+ event.title
+																+ '</div>');
+											},
+											eventMouseout : function(event,
+													jsEvent, view) {
+												$('#' + event.id).remove();
+											}
+										})
+
+					});
+</script>
+</head>
+
+<body>
+	<select id="dropdown"></select>
+
+	<div style="width: 60%; align: center">
+		<div id='calendar'></div>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,217 @@
+<html>
+<head>
+<link rel='stylesheet'
+	href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.css' />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+
+
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.js'></script>
+<script
+	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/gcal.js'></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+
+
+<style type="text/css">
+.hover-end {
+	padding: 0px;
+	margin: 0px;
+	font-size: 100%;
+	text-align: center;
+	position: absolute;
+	bottom: 0;
+	width: 70%;
+	opacity: 1;
+	z-index: 10000;
+	background-color: inherit;
+	color: inherit;
+	border-radius: 12.3200006484985px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(141, 178, 67);
+	display: block;
+}
+.gruppe {
+	border-radius: 12.3200006484985px;
+	border-style: solid;
+	border-width: 1px;
+	margin: 5px;
+    padding: 5px;
+    width: 60%;
+}
+
+.grupppe_intern {
+    padding: 5px;
+}
+</style>
+
+<script type="text/javascript">
+
+	var currentIds = {};
+
+	// eine Person hinzufuegen
+	function personHinzufuegen(id, name) {
+		event_url = "/Person/" + id + "/abwesenheiten"
+		currentIds[id] = event_url;
+		$('#calendar').fullCalendar('addEventSource', event_url)
+		createPersonButton(id, name)
+	}
+
+	// erzeuge den Button fuer eine Person
+	function createPersonButton(id, name) {
+		var $button = $('<button id="'+id+'_entfernen">' + name + '</button>');
+		$button.button({
+			classes : {
+				"ui-button" : "highlight"
+			},
+			icon : "ui-icon-circle-close",
+			iconPosition : "end"
+		});
+		$button.click(function(event) {
+			id = this.id.split("_")[0];
+			personEntfernen(id);
+		})
+		$button.appendTo($("#buttons"));
+	}
+
+	// eine einzelne Person rausschmeissen
+	function personEntfernen(id) {
+		event_url = currentIds[id];
+		$('#calendar').fullCalendar('removeEventSources', event_url)
+
+		delete currentIds[id];
+		
+		$('#'+id+'_entfernen').remove();
+	}
+	
+	// Performance-Verbesserung: Werden alle Personen geloescht ist diese function vielviel schneller 
+	function personenEntfernen(){
+		$("#buttons>button").remove()
+		currentIds = {};
+		$('#calendar').fullCalendar('removeEventSources')
+	}
+
+	// Jemand hat einen DropDown-Wert gewaehlt, hole die Daten
+	function selectedPersons(event, ui) {
+		$.each([ "firmen", "organisationen", "teams" ], function(index, typ) {
+			$("#" + typ).selectmenu("disable")
+		})
+		firma = $("#firmen").find(":selected").val();
+		organisation = $("#organisationen").find(":selected").val();
+		team = $("#teams").find(":selected").val();
+		url = "/personen/firma/" + firma + "/organisation/" + organisation
+				+ "/team/" + team
+		$.get(url, {}, function(ergebnisse) {
+			personenEntfernen();
+			$.each(ergebnisse, function(index, value) {
+				personHinzufuegen(value.id, value.vorname+" "+value.name);
+			})
+			$.each([ "firmen", "organisationen", "teams" ],
+					function(index, typ) {
+						$("#" + typ).selectmenu("enable")
+					})
+		}).fail(function(){
+			$.each([ "firmen", "organisationen", "teams" ],
+					function(index, typ) {
+						$("#" + typ).selectmenu("enable")
+					})
+		})
+	}
+
+	$(document).ready(
+			function() {
+
+				// Die leeren dropDowns sind zunaechst disabled 
+				$.each([ "firmen", "organisationen", "teams" ], function(index,
+						typ) {
+					$("#" + typ).selectmenu({
+						select : selectedPersons,
+						disabled : true
+					});
+				})
+
+				// initialisiere die Dropdowns
+				$.each([ "firmen", "organisationen", "teams" ], function(index,
+						typ) {
+					$.get('/Person/' + typ, {}, function(ergebnis) {
+						$.each(ergebnis, function(index, eintrag) {
+							$("#" + typ).append(
+									$("<option />").text(eintrag.name))
+						})
+						$("#" + typ).selectmenu("enable");
+					})
+				})
+				
+				/* Die Suche haben wir auch noch... */
+				$( "#suche" ).autocomplete({
+					source: "/person/suche",
+					minLength: 2,
+					select: function( event, ui ) {
+						personHinzufuegen( ui.item.value, ui.item.label );
+						$(this).val(''); 
+						return false;
+					}
+				});
+
+				// initialisiere den Kalender
+				$('#calendar').fullCalendar(
+						{
+							/* eventSources : eventSrc, */
+							weekNumbers : true,
+							weekends : false,
+							eventMouseover : function(event, jsEvent, view) {
+								$(this).append(
+										'<div id=\"'+event.id+'\" class=\"hover-end\">'
+												+ event.title + '</div>');
+							},
+							eventMouseout : function(event, jsEvent, view) {
+								$('#' + event.id).remove();
+							}
+						})
+			});
+</script>
+</head>
+
+<body>
+
+	<div class="gruppe">
+		<div class="grupppe_intern">
+			<select id="firmen">
+				<option selected="selected" value="ALLE">Alle Firmen
+				<option>
+			</select>
+		
+			<select id="organisationen">
+				<option selected="selected" value="ALLE">Alle Organisationen
+				<option>
+			</select>
+		
+			<select id="teams">
+				<option selected="selected" value="ALLE">Alle Teams
+				<option>
+			</select>
+		</div>
+		
+		<div class="ui-widget grupppe_intern">
+		  <label for="suche">Name/Firma/Team: </label>
+		  <input id="suche">
+		</div>
+	</div>
+
+	<div class="ui-widget gruppe">
+		<label>Gew&auml;hlte Personen</label>
+		<div id="buttons" class="ui-widget"></div>
+	</div>
+	
+	<div style="width: 60%; align: center">
+		<div id='calendar'></div>
+	</div>
+</body>
+
+</html>
