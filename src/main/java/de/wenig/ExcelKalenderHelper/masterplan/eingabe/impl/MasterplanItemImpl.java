@@ -1,6 +1,6 @@
 package de.wenig.ExcelKalenderHelper.masterplan.eingabe.impl;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import de.wenig.ExcelKalenderHelper.masterplan.eingabe.MasterplanItem;
 
@@ -8,8 +8,8 @@ public class MasterplanItemImpl implements MasterplanItem {
 
 	private final String description;
 	private final String release;
-	private final Date startDate;
-	private final Date endDate;
+	private final LocalDate startDate;
+	private final LocalDate endDate;
 	private final boolean isFullDay;
 	private final String responsible;
 
@@ -24,12 +24,12 @@ public class MasterplanItemImpl implements MasterplanItem {
 	}
 
 	@Override
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
 	@Override
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
@@ -38,7 +38,7 @@ public class MasterplanItemImpl implements MasterplanItem {
 		return isFullDay;
 	}
 
-	public MasterplanItemImpl(String description, String release, Date startDate, Date endDate, boolean isFullDay, String responsible) {
+	public MasterplanItemImpl(String description, String release, LocalDate startDate, LocalDate endDate, boolean isFullDay, String responsible) {
 		super();
 		this.description = description;
 		this.release = release;

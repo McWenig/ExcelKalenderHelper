@@ -4,7 +4,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	@Cacheable
 	public Abwesenheitskalender transformExcel(String pathToExcelAwk) {
 
-		HashMap<Person, List<Abwesenheit>> abwesenheiten = new HashMap<Person, List<Abwesenheit>>();
+		Abwesenheitskalender awk = new Abwesenheitskalender();
 
 		try {
 			File excelFile = new File(pathToExcelAwk);
@@ -63,7 +62,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 					Person person = createPersonFromRow(row);
 					List<Abwesenheit> abwesenheit = createAbwesenheitFromRow(row, dateRow);
 					if (person != null && abwesenheit != null) {
-						abwesenheiten.put(person, abwesenheit);
+						awk.putAbwesenheiten(person, abwesenheit);
 					}
 				}
 			}
@@ -72,7 +71,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			e.printStackTrace();
 		}
 
-		return new Abwesenheitskalender(abwesenheiten);
+		return awk;
 	}
 
 	private List<Abwesenheit> createAbwesenheitFromRow(Row row, Row dateRow) {

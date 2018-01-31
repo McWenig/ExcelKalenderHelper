@@ -1,13 +1,13 @@
 package de.wenig.ExcelKalenderHelper.masterplan.eingabe;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public interface MasterplanItem {
 	
 	String getDescription();
 	String getRelease();
-	Date getStartDate();
-	Date getEndDate();
+	LocalDate getStartDate();
+	LocalDate getEndDate();
 	boolean isWholeDayEvent();
 	String getResponsible();
 

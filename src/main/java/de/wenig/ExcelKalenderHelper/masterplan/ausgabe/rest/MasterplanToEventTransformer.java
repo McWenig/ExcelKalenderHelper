@@ -1,10 +1,10 @@
 package de.wenig.ExcelKalenderHelper.masterplan.ausgabe.rest;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.lang3.time.DateUtils;
 
 import de.wenig.ExcelKalenderHelper.common.Event;
 import de.wenig.ExcelKalenderHelper.masterplan.eingabe.Masterplan;
@@ -14,7 +14,7 @@ import de.wenig.ExcelKalenderHelper.masterplan.eingabe.factories.MasterplanFilte
 
 public class MasterplanToEventTransformer {
 
-	public static List<Event> transform(Masterplan mp, Date start, Date end, String release) {
+	public static List<Event> transform(Masterplan mp, LocalDate start, LocalDate end, String release) {
 		final List<Event> eventList = new LinkedList<>();
 
 		final MasterplanItemFilter filter = MasterplanFilterFactory.createFilter(start, end, release);
@@ -29,7 +29,8 @@ public class MasterplanToEventTransformer {
 						.concat("]");
 			}
 			final boolean allDay = true;
-			final Date itemStart = DateUtils.addDays(mpi.getStartDate(), 1);
+			/* Die Darstellung im Kalender braucht aus irgendeinem Grund einen Tag spaeter*/
+			final Date itemStart = Date.from(mpi.getStartDate().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
 			
 			final Event event = new Event(id, title, allDay, itemStart, itemStart);
 			eventList.add(event);

@@ -2,6 +2,8 @@ package de.wenig.ExcelKalenderHelper.masterplan.eingabe.factories;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -61,8 +63,8 @@ public class MasterplanFactoryImpl implements MasterplanFactory {
 
 		String description = getDescriptionFromRow(row);
 		String release = getReleaseFromRow(row);
-		Date startDate = getStartDateFromRow(row);
-		Date endDate = null;
+		LocalDate startDate = getStartDateFromRow(row);
+		LocalDate endDate = null;
 		boolean fullDay = true;
 		String responsible = getResponsibleFromRow(row);
 
@@ -71,8 +73,8 @@ public class MasterplanFactoryImpl implements MasterplanFactory {
 		return result;
 	}
 
-	private static Date getStartDateFromRow(Row row) {
-		Date result = null;
+	private static LocalDate getStartDateFromRow(Row row) {
+		LocalDate result = null;
 		if (row == null) {
 			return result;
 		}
@@ -83,7 +85,8 @@ public class MasterplanFactoryImpl implements MasterplanFactory {
 
 		FormulaEvaluator evaluator = row.getSheet().getWorkbook().getCreationHelper().createFormulaEvaluator();
 		CellValue value = evaluator.evaluate(dateCell);
-		result = DateUtil.getJavaDate(value.getNumberValue());
+		Date d = DateUtil.getJavaDate(value.getNumberValue());
+		result = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		return result;
 	}
 

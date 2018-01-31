@@ -1,10 +1,10 @@
 package de.wenig.ExcelKalenderHelper.masterplan.ausgabe.ical;
 
 import java.net.SocketException;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.wenig.ExcelKalenderHelper.masterplan.eingabe.Masterplan;
@@ -65,12 +65,7 @@ public class MasterplanToIcalTransormer {
 	}
 
 	private static CalendarComponent createCalComp(MasterplanItem mi) {
-		java.util.Date startDatePlusOne = DateUtils.addDays(mi.getStartDate(), 1);
-		Date startDate = new Date(startDatePlusOne.getTime());
-
-		// String iso88591 = new
-		// String(mi.getDescription().getBytes(Charset.forName("ISO-8859-1")));
-		// VEvent result = new VEvent(startDate, iso88591);
+		Date startDate = new Date(mi.getStartDate().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
 
 		VEvent result = new VEvent(startDate, getEventDescription(mi));
 
