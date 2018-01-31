@@ -1,8 +1,0 @@
-excelFile=P\:/R_RK/Masterplan/Masterplan_SEP51.xlsm
-
-spring.cache.jcache.provider=org.ehcache.jsr107.EhcacheCachingProvider
-spring.cache.jcache.config=classpath:ehcache.xml
-
-logging.level.org.springframework.web=TRACE
-logging.level.org.apache.tomcat.util.net=DEBUG
-logging.level.root=TRACE
