@@ -1,4 +1,4 @@
-package de.arbeitsagentur.masterplan.kalender;
+package de.wenig.ExcelKalenderHelper.masterplan.kalender;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;

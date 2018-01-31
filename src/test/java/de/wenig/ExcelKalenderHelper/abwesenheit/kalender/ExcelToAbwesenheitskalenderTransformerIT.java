@@ -1,4 +1,4 @@
-package de.arbeitsagentur.kalender.abwesenheit.kalender;
+package de.wenig.ExcelKalenderHelper.abwesenheit.kalender;
 
 import java.util.List;
 
