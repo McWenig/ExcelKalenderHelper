@@ -1,16 +1,16 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.validation.constraints.NotNull;
 
 public class Abwesenheit {
 
-	private final Date start;
-	private final Date end;
+	private final LocalDate start;
+	private final LocalDate end;
 	private final String status;
 	
-	public Abwesenheit(@NotNull Date start, @NotNull Date end, @NotNull String status) {
+	public Abwesenheit(@NotNull LocalDate start, @NotNull LocalDate end, @NotNull String status) {
 		this.start = start;
 		this.end = end;
 		this.status = status;
@@ -20,11 +20,11 @@ public class Abwesenheit {
 		return status;
 	}
 
-	public Date getEnd() {
+	public LocalDate getEnd() {
 		return end;
 	}
 
-	public Date getStart() {
+	public LocalDate getStart() {
 		return start;
 	}
 

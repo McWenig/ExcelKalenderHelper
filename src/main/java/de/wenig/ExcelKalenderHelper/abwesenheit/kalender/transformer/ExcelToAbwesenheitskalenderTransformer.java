@@ -1,6 +1,8 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -89,7 +91,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			if (zelle.getColumnIndex() >= SPALTE_ABWESENHEITEN_START) {
 				if (zelle.getCellType() == Cell.CELL_TYPE_STRING) {
 					String status = zelle.getStringCellValue();
-					Date datum = getDate(dateRow, zelle.getColumnIndex());
+					LocalDate datum = getDate(dateRow, zelle.getColumnIndex());
 					Abwesenheit a = new Abwesenheit(datum, datum, status);
 					result.add(a);
 				}
@@ -98,11 +100,12 @@ public class ExcelToAbwesenheitskalenderTransformer {
 		return result;
 	}
 
-	private  Date getDate(Row dateRow, int col) {
-		Date result = null;
+	private  LocalDate getDate(Row dateRow, int col) {
+		LocalDate result = null;
 		Cell zelle = dateRow.getCell(col);
 		if (zelle != null && zelle.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			result = zelle.getDateCellValue();
+			Date d = zelle.getDateCellValue();
+			result = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		}
 		return result;
 	}
