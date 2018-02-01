@@ -31,6 +31,9 @@ public class Abwesenheitskalender {
 	}
 
 	public List<Abwesenheit> getAbwesenheiten(Person p) {
+		if( ! abwesenheiten.containsKey(p) ){
+			throw new IllegalArgumentException("Person "+p.toString()+" unbekannt");
+		}
 		return Collections.unmodifiableList(abwesenheiten.get(p));
 	}
 	

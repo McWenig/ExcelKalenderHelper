@@ -1,13 +1,15 @@
-package de.wenig.ExcelKalenderHelper.abwesenheit.kalender;
+package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.Abwesenheitskalender;
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Abwesenheit;
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Firma;
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Organisation;
@@ -16,23 +18,27 @@ import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Team;
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer.ExcelToAbwesenheitskalenderTransformer;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ComponentScan(basePackages={"de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer"})
+@ContextConfiguration(classes = {TestConfig.class} )
 public class ExcelToAbwesenheitskalenderTransformerIT {
-
-	private static final String pathToExel = "P:/P_Produktbüro/Verwaltungsabläufe_alle_Mitarbeiter/Abwesenheitskalender_2018.xlsx";
 	
 	@Autowired
 	ExcelToAbwesenheitskalenderTransformer transformer;
 	
 	@Test
 	public void excelFileTransformieren() {
-		transformer = new ExcelToAbwesenheitskalenderTransformer();
+		String pathToExel = getClass().getClassLoader().getResource("AWK.xlsx").getFile();
 		Abwesenheitskalender awk = transformer.transformExcel(pathToExel);
-		Person p = new Person(17, "Wenig", "Martin", new Firma("ACN"), new Organisation("VAM-PO"), new Team("VAM-PO"));
+		Person p = new Person(17, "Battiste", "Sebrina", new Firma("CFU"), new Organisation("B"), new Team("D"));
 		List<Abwesenheit> abw = awk.getAbwesenheiten(p);
-		List<Person> luceneErgebnis = awk.suchePersonenLucene("Weni");
-		awk.getClass();
-		assert(true);
+		List<Person> luceneErgebnis = awk.suchePersonenLucene("Battiste");
+		LocalDate ersterJanuar = LocalDate.of(2018, 1, 1);
+		LocalDate sechsterJanuar = LocalDate.of(2018, 1, 6);
+		assert(abw.size() == 2);
+		assert(abw.get(0).getStatus().equalsIgnoreCase("F"));
+		assert(abw.get(1).getStatus().equalsIgnoreCase("F"));		
+		assert(abw.get(0).getStart().isEqual(ersterJanuar));
+		assert(abw.get(1).getStart().isEqual(sechsterJanuar));
+		assert(luceneErgebnis.size()==1);
 	}
 
 }
