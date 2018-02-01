@@ -1,8 +1,6 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -34,15 +32,12 @@ public class AbwesenheitenZusammenfasser {
 	public boolean istFortetzung(Abwesenheit letzterEintrag, Abwesenheit aktuellerEintrag) {
 		boolean result = false;
 
-		GregorianCalendar cal = new GregorianCalendar();
-		cal.setTime(letzterEintrag.getEnd());
-		cal.add(Calendar.DATE, 1);
-
-		if (aktuellerEintrag.getStart().equals(cal.getTime())) {
-			if (aktuellerEintrag.getStatus() == letzterEintrag.getStatus()) {
+		if(aktuellerEintrag.getStatus().equalsIgnoreCase(letzterEintrag.getStatus())){
+			if(aktuellerEintrag.getStart().isEqual(letzterEintrag.getEnd().plusDays(1))){
 				result = true;
 			}
 		}
+		
 		return result;
 	}
 }

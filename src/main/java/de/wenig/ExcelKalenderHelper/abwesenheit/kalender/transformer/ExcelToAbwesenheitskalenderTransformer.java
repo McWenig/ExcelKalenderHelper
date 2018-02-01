@@ -1,8 +1,9 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.transformer;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	@Cacheable
 	public Abwesenheitskalender transformExcel(String pathToExcelAwk) {
 
-		HashMap<Person, List<Abwesenheit>> abwesenheiten = new HashMap<Person, List<Abwesenheit>>();
+		Abwesenheitskalender awk = new Abwesenheitskalender();
 
 		try {
 			File excelFile = new File(pathToExcelAwk);
@@ -61,7 +62,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 					Person person = createPersonFromRow(row);
 					List<Abwesenheit> abwesenheit = createAbwesenheitFromRow(row, dateRow);
 					if (person != null && abwesenheit != null) {
-						abwesenheiten.put(person, abwesenheit);
+						awk.putAbwesenheiten(person, abwesenheit);
 					}
 				}
 			}
@@ -70,7 +71,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			e.printStackTrace();
 		}
 
-		return new Abwesenheitskalender(abwesenheiten);
+		return awk;
 	}
 
 	private List<Abwesenheit> createAbwesenheitFromRow(Row row, Row dateRow) {
@@ -89,7 +90,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			if (zelle.getColumnIndex() >= SPALTE_ABWESENHEITEN_START) {
 				if (zelle.getCellType() == Cell.CELL_TYPE_STRING) {
 					String status = zelle.getStringCellValue();
-					Date datum = getDate(dateRow, zelle.getColumnIndex());
+					LocalDate datum = getDate(dateRow, zelle.getColumnIndex());
 					Abwesenheit a = new Abwesenheit(datum, datum, status);
 					result.add(a);
 				}
@@ -98,11 +99,12 @@ public class ExcelToAbwesenheitskalenderTransformer {
 		return result;
 	}
 
-	private  Date getDate(Row dateRow, int col) {
-		Date result = null;
+	private  LocalDate getDate(Row dateRow, int col) {
+		LocalDate result = null;
 		Cell zelle = dateRow.getCell(col);
 		if (zelle != null && zelle.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-			result = zelle.getDateCellValue();
+			Date d = zelle.getDateCellValue();
+			result = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		}
 		return result;
 	}

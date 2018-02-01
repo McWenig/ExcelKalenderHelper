@@ -1,6 +1,6 @@
 package de.wenig.ExcelKalenderHelper.masterplan.eingabe.factories;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import de.wenig.ExcelKalenderHelper.masterplan.eingabe.MasterplanItemFilter;
 import de.wenig.ExcelKalenderHelper.masterplan.eingabe.impl.DateRangeItemFilter;
@@ -9,7 +9,7 @@ import de.wenig.ExcelKalenderHelper.masterplan.eingabe.impl.ReleaseItemFilter;
 
 public class MasterplanFilterFactory {
 
-	public static MasterplanItemFilter createDateRangeFilter(Date start, Date end) {
+	public static MasterplanItemFilter createDateRangeFilter(LocalDate start, LocalDate end) {
 		return new DateRangeItemFilter(start, end);
 	}
 
@@ -21,7 +21,7 @@ public class MasterplanFilterFactory {
 		return new ItemFilterChain(filters);
 	}
 	
-	public static MasterplanItemFilter createFilter(Date start, Date end, String release) {
+	public static MasterplanItemFilter createFilter(LocalDate start, LocalDate end, String release) {
 		MasterplanItemFilter filter = null;
 
 		final boolean dateSet = start != null && end != null;
