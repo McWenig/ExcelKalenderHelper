@@ -40,7 +40,7 @@ public class IcalControllerTest {
 		MasterplanFactory test = Mockito.mock(MasterplanFactory.class);
 		Masterplan mplan = Mockito.mock(Masterplan.class);
 		when(test.produceMasterplanFromExcel(anyObject())).thenReturn(mplan);
-		when(mplan.getFilteredItemList(anyObject())).thenReturn(Collections.EMPTY_LIST);
+		when(mplan.getFilteredItemList(anyObject())).thenReturn(Collections.emptyList());
 		
 		ReflectionTestUtils.setField(ical, "path", "P:/R_RK/Masterplan/Masterplan_SEP51.xlsm");
 		ReflectionTestUtils.setField(ical, "factory", test);

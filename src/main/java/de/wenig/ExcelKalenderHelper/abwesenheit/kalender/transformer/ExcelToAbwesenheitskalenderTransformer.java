@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -28,6 +30,8 @@ import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Team;
 @CacheConfig(cacheNames = "abwesenheitskalender")
 @Component
 public class ExcelToAbwesenheitskalenderTransformer {
+	
+	private Log log = LogFactory.getLog(ExcelToAbwesenheitskalenderTransformer.class);
 
 	public static final String REITER = "2018";
 
@@ -43,9 +47,6 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	@Autowired
 	private AbwesenheitenZusammenfasser zusammenfasser;
 	
-	public ExcelToAbwesenheitskalenderTransformer() {
-		// tue erst mal nichts-....
-	}
 
 	@Cacheable
 	public Abwesenheitskalender transformExcel(String pathToExcelAwk) {
@@ -58,7 +59,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			Sheet plan = w.getSheet(REITER);
 			Row dateRow = plan.getRow(REIHE_DATUM);
 			for (Row row : plan) {
-				if (row.getRowNum() > 3 && row.getRowNum() < 191) {
+				if (row.getRowNum() > REIHE_DATUM+1 ) {
 					Person person = createPersonFromRow(row);
 					List<Abwesenheit> abwesenheit = createAbwesenheitFromRow(row, dateRow);
 					if (person != null && abwesenheit != null) {
@@ -67,8 +68,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+			log.error("Fehler in der Umwandlung", e);
 		}
 
 		return awk;
@@ -124,48 +124,73 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	}
 
 	private  Team createTeamFromRow(Row row) {
-		String teamName = row.getCell(SPALTE_TEAM).getStringCellValue();
-		if (StringUtils.isBlank(teamName)) {
-			return null;
-		} else {
-			return new Team(teamName);
+		Team result = null;
+		try{
+			String name = row.getCell(SPALTE_TEAM).getStringCellValue();
+			if ( !StringUtils.isBlank(name)) {
+				result = new Team(name);
+			}
+			
+		}catch (Exception e) {
+			log.warn("Zeile: "+row.toString()+" enthält kein Team");
 		}
+		return result;
 	}
 
 	private  Organisation createOrganisationFromRow(Row row) {
-		String orgName = row.getCell(SPALTE_ORGANISATION).getStringCellValue();
-		if (StringUtils.isBlank(orgName)) {
-			return null;
-		} else {
-			return new Organisation(orgName);
+		Organisation result = null;
+		try{
+			String name = row.getCell(SPALTE_ORGANISATION).getStringCellValue();
+			if ( !StringUtils.isBlank(name)) {
+				result = new Organisation(name);
+			}
+			
+		}catch (Exception e) {
+			log.warn("Zeile: "+row.toString()+" enthält keine Organisation");
 		}
+		return result;
 	}
 
 	private  Firma createFirmaFromRow(Row row) {
-		String firmaName = row.getCell(SPALTE_FIRMA).getStringCellValue();
-		if (StringUtils.isBlank(firmaName)) {
-			return null;
-		} else {
-			return new Firma(firmaName);
+		Firma result = null;
+		try{
+			String name = row.getCell(SPALTE_FIRMA).getStringCellValue();
+			if ( !StringUtils.isBlank(name)) {
+				result = new Firma(name);
+			}
+			
+		}catch (Exception e) {
+			log.warn("Zeile: "+row.toString()+" enthält keine Firma");
 		}
+		return result;
 	}
 
 	private  String createVorameFromRow(Row row) {
-		String vorname = row.getCell(SPALTE_VORNAME).getStringCellValue();
-		if (StringUtils.isBlank(vorname)) {
-			return null;
-		} else {
-			return vorname;
+		String result = null;
+		try{
+			String name = row.getCell(SPALTE_VORNAME).getStringCellValue();
+			if ( !StringUtils.isBlank(name)) {
+				result = name;
+			}
+			
+		}catch (Exception e) {
+			log.warn("Zeile: "+row.toString()+" enthält keinen Vornamen");
 		}
+		return result;
 	}
 
 	private  String createNameFromRow(Row row) {
-		String name = row.getCell(SPALTE_NAME).getStringCellValue();
-		if (StringUtils.isBlank(name)) {
-			return null;
-		} else {
-			return name;
+		String result = null;
+		try{
+			String name = row.getCell(SPALTE_NAME).getStringCellValue();
+			if ( !StringUtils.isBlank(name)) {
+				result = name;
+			}
+			
+		}catch (Exception e) {
+			log.warn("Zeile: "+row.toString()+" enthält keinen Namen");
 		}
+		return result;
 	}
 
 }
