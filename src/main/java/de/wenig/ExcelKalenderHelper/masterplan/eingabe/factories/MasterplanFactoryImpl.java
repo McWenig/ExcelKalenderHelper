@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -27,11 +29,12 @@ import de.wenig.ExcelKalenderHelper.masterplan.eingabe.impl.MasterplanItemImpl;
 @Component
 public class MasterplanFactoryImpl implements MasterplanFactory {
 
+	private Log logger = LogFactory.getLog(MasterplanFactoryImpl.class);
+
 	public Masterplan produceMasterplanFromExcel(File excelFile) {
 		MasterplanImpl result = new MasterplanImpl();
 
-		try {
-			Workbook w = WorkbookFactory.create(excelFile, null, true);
+		try (Workbook w = WorkbookFactory.create(excelFile, null, true)) {
 			Sheet plan = w.getSheet(MP);
 			for (Row row : plan) {
 				MasterplanItem mpi = createMasteplanItemFromRow(row);
@@ -39,15 +42,8 @@ public class MasterplanFactoryImpl implements MasterplanFactory {
 					result.addItem(mpi);
 				}
 			}
-		} catch (EncryptedDocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+			logger.error("Fehler beim lesen des Masterplan-Dokuments", e);
 		}
 
 		return result;
@@ -104,10 +100,10 @@ public class MasterplanFactoryImpl implements MasterplanFactory {
 		sb.append(description);
 		return sb.toString();
 	}
-	
+
 	private static String getResponsibleFromRow(Row row) {
 		String owner = null;
-		if(row != null){
+		if (row != null) {
 			owner = row.getCell(OWNER_COLUMN).getStringCellValue();
 		}
 		return owner;

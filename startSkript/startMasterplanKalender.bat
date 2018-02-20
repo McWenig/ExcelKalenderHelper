@@ -1,3 +1,3 @@
-set JAVA_HOME="C:\Program Files (x86)\Java\jre1.8.0"
+set JAVA_HOME="C:\eclipse\jdk1.8.0_141"
 
-%JAVA_HOME%\bin\javaw.exe -jar c:\ba_dev10\MasterplanKalender\target\masterplan-0.1.0.jar
+%JAVA_HOME%\bin\javaw.exe -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -jar c:\ba_dev10\MasterplanKalender\target\masterplan-0.1.0.jar

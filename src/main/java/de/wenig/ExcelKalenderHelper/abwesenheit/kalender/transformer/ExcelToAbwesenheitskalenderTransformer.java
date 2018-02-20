@@ -48,14 +48,13 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	private AbwesenheitenZusammenfasser zusammenfasser;
 	
 
-	@Cacheable
+	@Cacheable(sync=true)
 	public Abwesenheitskalender transformExcel(String pathToExcelAwk) {
 
 		Abwesenheitskalender awk = new Abwesenheitskalender();
 
-		try {
-			File excelFile = new File(pathToExcelAwk);
-			Workbook w = WorkbookFactory.create(excelFile, null, true);
+		File excelFile = new File(pathToExcelAwk);
+		try (Workbook w = WorkbookFactory.create(excelFile, null, true)){
 			Sheet plan = w.getSheet(REITER);
 			Row dateRow = plan.getRow(REIHE_DATUM);
 			for (Row row : plan) {
