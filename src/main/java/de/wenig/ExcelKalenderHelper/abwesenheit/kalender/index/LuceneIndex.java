@@ -1,4 +1,4 @@
-package de.wenig.ExcelKalenderHelper.abwesenheit.kalender;
+package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.index;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -23,12 +25,16 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.RAMDirectory;
 
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Abwesenheit;
 import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Person;
 
 public class LuceneIndex {
+	
+	private Log log = LogFactory.getLog(LuceneIndex.class);
+	
 	private Map<Integer, Person> personIndex = new HashMap<Integer, Person>();
 
 	private final Analyzer analyzer = new StandardAnalyzer();
@@ -65,14 +71,16 @@ public class LuceneIndex {
 				personIndex.put(p.getId(), p);
 			}
 			iwriter.close();
-		} catch (IOException ioex) {
-			// TODO take care
-			ioex.printStackTrace();
+		} catch(LockObtainFailedException ex){
+			log.info("Lucene index kann nicht geschrieben werden, da aktuell gelockt", ex);
+		}
+		catch (IOException ioex) {
+			log.error("Fehler beim bauen des Lucene-Index", ioex);
 		}
 
 	}
 
-	public List<Person> suchePersonenLucene(String suchString) {
+	public List<Person> suchePersonen(String suchString) {
 		List<Person> result = new LinkedList<Person>();
 		try {
 			DirectoryReader ireader = DirectoryReader.open(directory);
@@ -90,13 +98,12 @@ public class LuceneIndex {
 			}
 
 		} catch (IOException | ParseException ioException) {
-			// TODO take care
-			ioException.printStackTrace();
+			log.error(ioException);
 		}
 		return result;
 	}
 
-	public List<Person> suchePersonenLucene(String firma, String organisation, String team) {
+	public List<Person> suchePersonen(String firma, String organisation, String team) {
 		List<Person> result = new LinkedList<Person>();
 		if (SPEZIAL_ALLE.equalsIgnoreCase(team) && SPEZIAL_ALLE.equalsIgnoreCase(organisation)
 				&& SPEZIAL_ALLE.equalsIgnoreCase(firma)) {

@@ -44,6 +44,10 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	public static final int SPALTE_TEAM = 6;
 	public static final int SPALTE_ABWESENHEITEN_START = 8;
 	
+	//TODO diese Konstante muss durch etwas sinnvolles erestzt werden. 
+	//Jetzt ist sie erstmal da, um die Performance zu erhöhen 
+	public static final int  MAX_ROW = 200;
+	
 	@Autowired
 	private AbwesenheitenZusammenfasser zusammenfasser;
 	
@@ -51,14 +55,14 @@ public class ExcelToAbwesenheitskalenderTransformer {
 	@Cacheable(sync=true)
 	public Abwesenheitskalender transformExcel(String pathToExcelAwk) {
 
-		Abwesenheitskalender awk = new Abwesenheitskalender();
+		Abwesenheitskalender.Builder awk = new Abwesenheitskalender.Builder();
 
 		File excelFile = new File(pathToExcelAwk);
 		try (Workbook w = WorkbookFactory.create(excelFile, null, true)){
 			Sheet plan = w.getSheet(REITER);
 			Row dateRow = plan.getRow(REIHE_DATUM);
 			for (Row row : plan) {
-				if (row.getRowNum() > REIHE_DATUM+1 ) {
+				if (row.getRowNum() > REIHE_DATUM+1 && row.getRowNum() < MAX_ROW) {
 					Person person = createPersonFromRow(row);
 					List<Abwesenheit> abwesenheit = createAbwesenheitFromRow(row, dateRow);
 					if (person != null && abwesenheit != null) {
@@ -70,7 +74,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			log.error("Fehler in der Umwandlung", e);
 		}
 
-		return awk;
+		return awk.build();
 	}
 
 	private List<Abwesenheit> createAbwesenheitFromRow(Row row, Row dateRow) {
@@ -131,7 +135,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			}
 			
 		}catch (Exception e) {
-			log.warn("Zeile: "+row.toString()+" enthält kein Team");
+			log.warn("Zeile "+row.getRowNum()+" enthält kein Team");
 		}
 		return result;
 	}
@@ -145,7 +149,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			}
 			
 		}catch (Exception e) {
-			log.warn("Zeile: "+row.toString()+" enthält keine Organisation");
+			log.warn("Zeile "+row.getRowNum()+" enthält keine Organisation");
 		}
 		return result;
 	}
@@ -159,7 +163,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			}
 			
 		}catch (Exception e) {
-			log.warn("Zeile: "+row.toString()+" enthält keine Firma");
+			log.warn("Zeile "+row.getRowNum()+" enthält keine Firma");
 		}
 		return result;
 	}
@@ -173,7 +177,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			}
 			
 		}catch (Exception e) {
-			log.warn("Zeile: "+row.toString()+" enthält keinen Vornamen");
+			log.warn("Zeile "+row.getRowNum()+" enthält keinen Vornamen");
 		}
 		return result;
 	}
@@ -187,7 +191,7 @@ public class ExcelToAbwesenheitskalenderTransformer {
 			}
 			
 		}catch (Exception e) {
-			log.warn("Zeile: "+row.toString()+" enthält keinen Namen");
+			log.warn("Zeile "+row.getRowNum()+" enthält keinen Namen");
 		}
 		return result;
 	}

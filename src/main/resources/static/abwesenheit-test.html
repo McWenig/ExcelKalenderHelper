@@ -1,21 +1,14 @@
 <html>
 <head>
-<link rel='stylesheet'
-	href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.css' />
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+<link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.css' />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
 
 
-<script
-	src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js'></script>
-<script
-	src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js'></script>
-<script
-	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.js'></script>
-<script
-	src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/gcal.js'></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/fullcalendar.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.8.0/gcal.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
 
 
 <style type="text/css">
@@ -37,17 +30,18 @@
 	border-color: rgb(141, 178, 67);
 	display: block;
 }
+
 .gruppe {
 	border-radius: 12.3200006484985px;
 	border-style: solid;
 	border-width: 1px;
 	margin: 5px;
-    padding: 5px;
-    width: 60%;
+	padding: 5px;
+	width: 60%;
 }
 
 .grupppe_intern {
-    padding: 5px;
+	padding: 5px;
 }
 </style>
 
@@ -159,6 +153,19 @@
 					}
 				});
 
+				// initialisere den "Alle loeschen" Button
+			
+				$("#alleLoeschenButton").button({
+					classes : {
+						"ui-button" : "highlight"
+					},
+					icon : "ui-icon-circle-close",
+					iconPosition : "end"
+				});
+				$("#alleLoeschenButton").click(function(event) {
+					personenEntfernen();
+				})
+
 				// initialisiere den Kalender
 				$('#calendar').fullCalendar(
 						{
@@ -185,30 +192,26 @@
 			<select id="firmen">
 				<option selected="selected" value="ALLE">Alle Firmen
 				<option>
-			</select>
-		
-			<select id="organisationen">
+			</select> <select id="organisationen">
 				<option selected="selected" value="ALLE">Alle Organisationen
 				<option>
-			</select>
-		
-			<select id="teams">
+			</select> <select id="teams">
 				<option selected="selected" value="ALLE">Alle Teams
 				<option>
 			</select>
 		</div>
-		
+
 		<div class="ui-widget grupppe_intern">
-		  <label for="suche">Name/Firma/Team: </label>
-		  <input id="suche">
+			<label for="suche">Name/Firma/Team: </label> <input id="suche">
 		</div>
 	</div>
 
 	<div class="ui-widget gruppe">
 		<label>Gew&auml;hlte Personen</label>
+		<button id="alleLoeschenButton">Alle entfernen</button>
 		<div id="buttons" class="ui-widget"></div>
 	</div>
-	
+
 	<div style="width: 60%; align: center">
 		<div id='calendar'></div>
 	</div>

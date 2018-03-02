@@ -1,4 +1,4 @@
-package de.wenig.ExcelKalenderHelper.abwesenheit.kalender;
+package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.index;
 
 import java.util.Collections;
 import java.util.HashMap;
