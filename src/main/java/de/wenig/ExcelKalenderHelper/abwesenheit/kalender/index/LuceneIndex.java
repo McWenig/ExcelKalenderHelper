@@ -1,6 +1,7 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.index;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -33,11 +35,26 @@ import de.wenig.ExcelKalenderHelper.abwesenheit.kalender.data.Person;
 
 public class LuceneIndex {
 	
+	
+	public static final CharArraySet ENGLISH_STOP_WORDS_SET_WO_AT;
+	
+	static {
+		final List<String> stopWords = Arrays.asList(
+		      "a", "an", "and", "are", "as", "be", "but", "by",
+		      "for", "if", "in", "into", "is", "it",
+		      "no", "not", "of", "on", "or", "such",
+		      "that", "the", "their", "then", "there", "these",
+		      "they", "this", "to", "was", "will", "with"
+		    );
+		    final CharArraySet stopSet = new CharArraySet(stopWords, false);
+		ENGLISH_STOP_WORDS_SET_WO_AT = CharArraySet.unmodifiableSet(stopSet);
+	}
+	
 	private Log log = LogFactory.getLog(LuceneIndex.class);
 	
 	private Map<Integer, Person> personIndex = new HashMap<Integer, Person>();
 
-	private final Analyzer analyzer = new StandardAnalyzer();
+	private final Analyzer analyzer = new StandardAnalyzer(ENGLISH_STOP_WORDS_SET_WO_AT);
 	private Directory directory = new RAMDirectory();
 
 	private static final String FIELD_NAME = "name";

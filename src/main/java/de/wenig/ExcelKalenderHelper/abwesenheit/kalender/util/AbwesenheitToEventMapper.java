@@ -1,6 +1,8 @@
 package de.wenig.ExcelKalenderHelper.abwesenheit.kalender.util;
 
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +49,18 @@ public class AbwesenheitToEventMapper {
 		builder.append("[").append(a.getStatus()).append("]");
 		builder.append(p.getVorname()).append(" ").append(p.getName());
 		builder.append("(").append(p.getFirma().getName()).append(")");
+		if( ChronoUnit.DAYS.between(a.getStart(), a.getEnd()) > 3 ){
+			builder.append( getZeitraumString(a) );
+		}
+		return builder.toString();
+	}
+	
+	private String getZeitraumString(Abwesenheit a){
+		StringBuilder builder = new StringBuilder();
+		builder.append(" ");
+		builder.append( a.getStart().format(DateTimeFormatter.ofPattern("dd.MM.")));
+		builder.append(" - ");
+		builder.append( a.getEnd().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
 		return builder.toString();
 	}
 
